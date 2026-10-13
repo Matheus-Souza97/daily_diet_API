@@ -49,7 +49,7 @@ Antes de executar o projeto, você precisa ter instalado:
 ### 1. Clone o repositório
 
 ```bash
-git clone <URL_DO_REPOSITORIO>
+git clone <https://github.com/Matheus-Souza97/daily_diet_API>
 ```
 
 ### 2. Acesse a pasta do projeto
