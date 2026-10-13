@@ -97,4 +97,23 @@ export async function foodRoutes(app: FastifyInstance) {
 
     return reply.status(200).send({deleteMeal})
   })
+
+  app.get('/', async (request, reply) => {
+    const sessionId = request.cookies.sessionId
+
+    if ( !sessionId) {
+      return reply.status(401).send('Unauthorized')
+    }
+
+    const user = await knex('users').where({session_id: sessionId}).first('id')
+
+    if (!user) {
+      return reply.status(401).send('Unauthorized')
+    }
+    
+    const meal = await knex('food').where({user_id:user.id}).select()
+
+    return reply.status(200).send({meal})
+
+  })
 }
