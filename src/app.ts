@@ -1,5 +1,6 @@
 import fastify from "fastify";
 import { usersRoutes } from "./routes/users.js";
+import { foodRoutes } from "./routes/food.js";
 import cookie from '@fastify/cookie' // npm install @fastify/cookie
 
 
@@ -10,5 +11,9 @@ app.register(cookie)
 
 app.register(usersRoutes, {
   prefix: '/users'
+})
+
+app.register(foodRoutes, {
+  prefix: '/food'
 })
 
