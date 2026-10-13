@@ -146,4 +146,46 @@ export async function foodRoutes(app: FastifyInstance) {
     return reply.status(200).send({meal})
 
   })
+
+  app.get('/metric', async (request, reply) => {
+    const sessionId = request.cookies.sessionId
+
+    if ( !sessionId) {
+      return reply.status(401).send('Unauthorized')
+    }
+
+    const user = await knex('users').where({session_id: sessionId}).first('id')
+
+    if (!user) {
+      return reply.status(401).send('Unauthorized')
+    }
+    
+    const totalMeals = await knex('food').where({user_id:user.id}).count('* as totalMeals').first()
+    const mealsOnDiet = await knex('food').where({user_id:user.id, diet:'s'}).count('* as totalMealOnDiet').first()
+    const mealsOffDiet = await knex('food').where({user_id:user.id, diet:'n'}).count('* as totalMealsOffDiet').first()
+    const meals = await knex('food').where({ user_id: user.id }).orderBy('created_at', 'asc')
+
+    let currentSequence = 0
+    let bestOnDietSequence = 0
+
+    for (const meal of meals) {
+      if (meal.diet === 's') {
+        currentSequence++
+
+        if (currentSequence > bestOnDietSequence) {
+          bestOnDietSequence = currentSequence
+        }
+      } else {
+        currentSequence = 0
+      }
+    }
+
+    return reply.status(200).send({
+      totalMeals: Number(totalMeals?.totalMeals ?? 0),
+      mealsOnDiet: Number(mealsOnDiet?.totalMealOnDiet ?? 0),
+      mealsOffDiet: Number(mealsOffDiet?.totalMealsOffDiet ?? 0),
+      bestOnDietSequence,
+    })
+
+  })
 }
